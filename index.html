@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoVisor Territorial · Juan Mina</title>
+  <link rel="preconnect" href="https://maps.google.com" crossorigin />
+  <link rel="preconnect" href="https://www.google.com" crossorigin />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <link rel="stylesheet" href="styles.css?v=spatial-panel-heading-4" />
+</head>
+<body>
+  <div id="map"></div>
+
+  <section id="welcome-notice" class="welcome-guide" role="dialog" aria-modal="true" aria-labelledby="welcome-title" aria-describedby="welcome-intro" hidden>
+    <div class="welcome-card">
+      <button id="close-welcome-notice" class="welcome-close" type="button" aria-label="Cerrar bienvenida">×</button>
+      <div class="brand-mark welcome-brand-mark" aria-hidden="true">
+        <span class="brand-mark-ring brand-mark-ring-gold"><span class="brand-mark-ring brand-mark-ring-green">
+          <svg class="brand-mark-star" viewBox="0 0 100 100" focusable="false"><polygon points="50,3 58,37 82,18 68,43 97,50 68,57 82,82 58,63 50,97 42,63 18,82 32,57 3,50 32,43 18,18 42,37" /></svg>
+          <span class="brand-mark-letters">JM</span>
+        </span></span>
+      </div>
+      <span class="eyebrow">GeoVisor Territorial · Juan Mina · Barranquilla</span>
+      <h2 id="welcome-title">Explora el territorio de Juan Mina</h2>
+      <p id="welcome-intro" class="welcome-intro">Consulta sus capas, compara mapas y descubre las herramientas para analizar este territorio de Barranquilla.</p>
+      <div class="welcome-actions"><button id="skip-to-map" class="welcome-skip" type="button">Omitir</button><button id="show-tutorial" class="welcome-submit" type="button">Comenzar recorrido <span aria-hidden="true">→</span></button></div>
+    </div>
+  </section>
+
+  <section id="functionality-notice" class="welcome-guide" role="dialog" aria-modal="true" aria-labelledby="tutorial-title" aria-describedby="tutorial-intro" hidden>
+    <div class="welcome-card">
+      <button id="close-functionality-notice" class="welcome-close" type="button" aria-label="Cerrar listado">×</button>
+      <span class="eyebrow">GeoVisor Territorial · Juan Mina · Barranquilla · Manual</span>
+      <h2 id="tutorial-title">Listado de funcionalidades</h2>
+      <p id="tutorial-intro" class="welcome-intro">Cada herramienta conserva su función y abre su propio panel o pestaña cuando corresponde. Si prefieres una explicación paso a paso, inicia el recorrido guiado.</p>
+      <div class="guide-content">
+        <section class="guide-section"><h3>Explorar el mapa</h3><ul>
+          <li><strong>Capas y mapas base:</strong> activa o desactiva límite, manzanas, usos del suelo, tratamientos y vías. Abre «Mapa base» para elegir entre imágenes, calles, National Geographic, topográfico y Sunny.</li>
+          <li><strong>Navegación:</strong> arrastra el mapa para desplazarte; usa la brújula para moverlo o volver al centro de Juan Mina, y el control deslizante o los botones para acercar y alejar.</li>
+          <li><strong>Escala y coordenadas:</strong> consulta la escala gráfica y mueve el cursor sobre el mapa para ver latitud y longitud.</li>
+          <li><strong>Divisor:</strong> compara los mapas base de imágenes y calles. Cambia la orientación entre vertical y horizontal con el botón que aparece sobre el mapa y arrastra el separador.</li>
+        </ul></section>
+        <section class="guide-section"><h3>Dibujar y medir</h3><ul>
+          <li><strong>Punto, línea y polígono:</strong> agrega elementos al mapa haciendo clic; termina una línea o polígono con doble clic.</li>
+          <li><strong>Medir:</strong> activa Medir junto a Punto, Línea y Polígono; selecciona unidades de distancia y área. Usa dos puntos para una distancia y tres o más para un área.</li>
+          <li><strong>Estilo dibujo:</strong> selecciona un dibujo y personaliza color, grosor, patrón, relleno y tamaño de punto. También puedes eliminar el dibujo seleccionado.</li>
+        </ul></section>
+        <section class="guide-section"><h3>Analizar y compartir</h3><ul>
+          <li><strong>Herramientas GIS:</strong> selecciona una capa, ajusta color y opacidad, o clasifícala por un atributo.</li>
+          <li><strong>Etiquetas:</strong> elige un shapefile y etiqueta por campo o expresión. Ajusta fuente, tamaño y color del texto; cambia o quita el relleno y el contorno con sus colores y transparencias; define la posición para puntos, líneas y polígonos; filtra con clases y limita la visibilidad por escala. Usa “Mostrar etiquetas de esta capa” para activarlas o desactivarlas.</li>
+          <li><strong>Análisis espacial:</strong> abre la pestaña del mismo nombre en el panel inferior para calcular la influencia de vías, cruzar usos y tratamientos, revisar indicadores y exportar tablas.</li>
+          <li><strong>Herramientas GIS:</strong> crea buffers o encuentra el área común entre dos capas para consultas generales.</li>
+          <li><strong>Tabla:</strong> consulta atributos, filtra por campo y valor, selecciona resultados y acerca el mapa a ellos.</li>
+          <li><strong>Exportar mapa:</strong> descarga la vista del mapa como PDF con la plantilla cartográfica o como imagen PNG.</li>
+          <li><strong>Análisis espacial y estadístico:</strong> ambas herramientas están en “Funciones avanzadas” del panel del proyecto; el análisis espacial aparece debajo del estadístico.</li>
+          <li><strong>Limpiar:</strong> quita dibujos, resultados de análisis y selecciones que agregaste.</li>
+        </ul></section>
+      </div>
+      <div class="welcome-footer"><span>También puedes volver a este listado con el botón “Manual”.</span><div class="welcome-actions"><button id="start-guided-tour" class="welcome-submit" type="button">Iniciar recorrido</button><button id="start-exploring" class="welcome-skip" type="button">Cerrar</button></div></div>
+    </div>
+  </section>
+
+  <section id="guided-tour" class="welcome-guide" role="dialog" aria-modal="true" aria-labelledby="tour-step-title" aria-describedby="tour-step-description" hidden>
+    <div class="welcome-card tour-card">
+      <button id="close-guided-tour" class="welcome-close" type="button" aria-label="Cerrar recorrido">×</button>
+      <span class="eyebrow">GeoVisor Territorial · Juan Mina · Barranquilla</span>
+      <span class="tour-step-kicker">Recorrido guiado · <span id="tour-step-count">Paso 1 de 9</span></span>
+      <div class="tour-step-icon" id="tour-step-icon" aria-hidden="true">▤</div>
+      <h2 id="tour-step-title">Capas y mapas base</h2>
+      <p id="tour-step-description" class="welcome-intro"></p>
+      <div class="tour-progress" aria-hidden="true"><span id="tour-progress-fill"></span></div>
+      <div class="tour-navigation"><button id="tour-back" class="welcome-skip" type="button">← Anterior</button><button id="tour-close-action" class="welcome-skip" type="button">Cerrar</button><button id="tour-next" class="welcome-submit" type="button">Siguiente →</button></div>
+    </div>
+  </section>
+
+  <button id="left-panel-toggle" class="side-panel-toggle left-panel-toggle" type="button" aria-controls="map-overlay" aria-expanded="true" aria-label="Ocultar panel izquierdo" title="Ocultar panel izquierdo">‹</button>
+  <div class="map-overlay" id="map-overlay">
+    <div class="brand-card">
+      <div class="brand-mark" aria-label="Insignia JM">
+        <span class="brand-mark-ring brand-mark-ring-gold">
+          <span class="brand-mark-ring brand-mark-ring-green">
+            <svg class="brand-mark-star" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+              <polygon points="50,3 58,37 82,18 68,43 97,50 68,57 82,82 58,63 50,97 42,63 18,82 32,57 3,50 32,43 18,18 42,37" />
+            </svg>
+            <span class="brand-mark-letters">JM</span>
+          </span>
+        </span>
+      </div>
+      <div>
+        <h1>GeoVisor Territorial</h1>
+        <p>Juan Mina · Barranquilla</p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button id="street-view-toggle" class="tool-btn secondary" type="button" aria-controls="street-view-panel" aria-expanded="false"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20v-2a7 7 0 0 1 14 0v2M12 11v7"/></svg><span>Street View</span></button>
+      <button id="split-toggle" class="tool-btn" type="button"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 7h5l-2-2m2 2-2 2m11 8h-5l2-2m-2 2 2 2"/></svg><span>Divisor</span></button>
+      <button id="clear-drawings" class="tool-btn secondary" type="button" title="Quita dibujos, resultados de análisis y selecciones"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v7m4-7v7M5 7l1 14h12l1-14M9 7V4h6v3"/></svg><span>Limpiar</span></button>
+      <button id="attributes-toggle" class="tool-btn secondary" type="button"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11m6-11v11"/></svg><span>Tabla</span></button>
+      <button id="save-map" class="tool-btn secondary" type="button" aria-label="Exportar mapa" aria-controls="map-export-panel" aria-expanded="false"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg><span>Exportar mapa</span></button>
+      <button id="drawing-style-toggle" class="tool-btn secondary" type="button" aria-expanded="false"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6 4 4M4 20l4-.8L19 8a2.8 2.8 0 0 0-4-4L4 15zM4 20h16"/></svg><span>Estilo dibujo</span></button>
+      <button id="labels-toggle" class="tool-btn secondary" type="button" aria-controls="labels-panel" aria-expanded="false"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4a2 2 0 0 1 2-2h7l10 10-9 9L3 11V4Z"/><circle cx="8" cy="7" r="1"/></svg><span>Etiquetas</span></button>
+      <button id="open-welcome-guide" class="tool-btn secondary" type="button"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg><span>Manual</span></button>
+    </div>
+
+
+
+    <section id="street-view-panel" class="street-view-panel" aria-label="Google Street View" aria-hidden="true" hidden>
+    <div class="street-view-heading"><div><span class="eyebrow">Vista panorámica</span><h2>Street View</h2></div><div class="street-view-actions"><button id="street-view-reload" type="button" title="Cargar el centro actual del mapa">Centro del mapa</button><button id="street-view-close" type="button" aria-label="Cerrar Street View">×</button></div></div>
+    <p id="street-view-status" class="street-view-status" role="status">Al abrir, se buscará el panorama cercano a la ubicación seleccionada.</p>
+    <div class="street-view-frame-wrap"><iframe id="street-view-frame" title="Panorama interactivo de Google Street View" loading="eager" fetchpriority="high" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+    <p class="street-view-note">Selecciona un punto del mapa para ubicar la persona. Con Street View abierto, usa ← ↑ → ↓ para moverla; haz clic primero en el mapa si las flechas están controlando el panorama.</p>
+  </section>
+
+    <section class="analysis-panel" aria-label="Herramientas GIS">
+      <h2>Herramientas GIS</h2>
+      <label>Capa vectorial <select id="vector-layer"><option value="">Detectar capas</option></select></label>
+      <label>Superponer con <select id="overlay-layer"><option value="">Misma capa</option></select></label>
+      <label>Color del buffer <input id="layer-color" type="color" value="#c96e57" /></label>
+      <label>Opacidad del buffer <input id="layer-opacity" type="range" min="0" max="100" value="55" /><output id="opacity-value">55%</output></label>
+      <p class="buffer-style-note">Estos ajustes solo cambian el buffer actual y se aplican al siguiente que crees.</p>
+      <label>Clasificar por <select id="class-field"><option value="">Sin clasificación</option></select></label>
+      <label>Buffer (metros) <input id="buffer-distance" type="number" min="1" value="100" /></label>
+      <div class="panel-actions"><button id="make-buffer" type="button">Crear buffer</button><button id="delete-buffer" type="button" disabled>Eliminar buffer</button><button id="overlay-intersection" type="button">Intersección</button></div>
+      <p id="tool-status" role="status">Carga una capa vectorial para habilitar análisis.</p>
+    </section>
+
+    <section id="attribute-table" class="attribute-table" aria-label="Tabla de atributos" hidden>
+      <div class="attribute-table-heading"><h2>Tabla de atributos</h2><label class="attribute-table-layer-picker">Capa <select id="attribute-layer"><option value="">Cargando capas…</option></select></label><button id="close-attribute-table" type="button" aria-label="Cerrar tabla">×</button></div>
+      <p id="attribute-table-status" class="attribute-table-status" role="status">Selecciona una capa para consultar sus atributos.</p>
+      <div class="table-tools">
+        <label>Campo <select id="attribute-field"><option value="">Selecciona campo</option></select></label>
+        <label>Condición <select id="attribute-match"><option value="contains">Contiene</option><option value="equals">Es igual a</option></select></label>
+        <label>Valor <input id="attribute-query" type="search" placeholder="Escribe un valor" /></label>
+        <div class="panel-actions"><button id="select-attribute" type="button">Seleccionar resultados</button><button id="zoom-selection" type="button">Acercar</button><button id="clear-selection" type="button">Quitar selección</button></div>
+      </div>
+      <div class="panel-actions attribute-edit-actions"><button id="attribute-edit-toggle" type="button" aria-pressed="false">Editar atributos</button><button id="geometry-edit-toggle" type="button" aria-pressed="false">Editar geometrías</button><button id="attribute-export" type="button">Descargar GeoJSON</button></div>
+      <p id="attribute-edit-status" class="attribute-edit-status" role="status">Los cambios se aplican en esta sesión. Descarga la capa para conservarlos.</p>
+      <div id="attribute-grid"></div>
+    </section>
+<div class="drawing-toolbar" aria-label="Herramientas de dibujo">
+      <button class="draw-tool" data-draw="marker" type="button" title="Punto"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1"/></svg><span>Punto</span></button>
+      <button class="draw-tool" data-draw="polyline" type="button" title="Línea"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 18 6-12 5 10 5-8"/><circle cx="4" cy="18" r="1"/><circle cx="10" cy="6" r="1"/><circle cx="15" cy="16" r="1"/><circle cx="20" cy="8" r="1"/></svg><span>Línea</span></button>
+      <button class="draw-tool" data-draw="polygon" type="button" title="Polígono"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 7-4 11H6L3 10l9-7Z"/><circle cx="12" cy="3" r="1"/><circle cx="21" cy="10" r="1"/><circle cx="17" cy="21" r="1"/><circle cx="6" cy="21" r="1"/><circle cx="3" cy="10" r="1"/></svg><span>Polígono</span></button>
+    </div>
+  </div>
+
+  <section id="split-panel" class="split-tool-panel" aria-label="Herramienta divisor" hidden>
+    <h2>Comparar mapas</h2>
+    <p>Activa o desactiva el divisor para comparar las imágenes satelitales con el mapa de calles. Arrastra la línea sobre el mapa para ajustar la comparación.</p>
+    <button id="split-panel-toggle" type="button">Alternar divisor</button>
+    <p id="split-panel-status" role="status">El divisor está cerrado.</p>
+  </section>
+
+  <section id="map-export-panel" class="map-export-panel" aria-label="Exportar mapa como PDF o PNG" hidden>
+    <div class="export-panel-heading"><div><span class="eyebrow">Exportación</span><h2>Exportar mapa</h2></div><button id="close-export-panel" type="button" aria-label="Cerrar exportación">×</button></div>
+    <label>Título del mapa <input id="export-title" type="text" value="Mapa de Juan Mina" maxlength="140"></label>
+    <label>Facultad <input id="export-faculty" type="text" value="FACULTAD DE ARQUITECTURA E INGENIERÍA" maxlength="140"></label>
+    <label>Programa <input id="export-program" type="text" value="TECNOLOGÍA EN GESTIÓN CATASTRAL" maxlength="140"></label>
+    <label>Fuente <input id="export-source" type="text" value="" maxlength="180"></label>
+    <label>Autor <input id="export-author" type="text" value="Melani Dianaly Rodríguez Rodríguez" maxlength="140"></label>
+    <label class="export-title-toggle"><input id="export-grid" type="checkbox" checked> Mostrar cuadrícula de coordenadas</label>
+    <label class="export-title-toggle"><input id="export-locator" type="checkbox" checked> Mostrar mapa de localización</label>
+    <label>Tipo de norte <select id="export-north-style"><option value="classic">Flecha clásica</option><option value="minimal">Flecha minimalista</option><option value="rose" selected>Rosa de los vientos</option><option value="nautical">Rosa náutica de ocho puntas</option></select></label>
+    <label>Formato <select id="export-format"><option value="pdf">PDF</option><option value="png">Imagen PNG</option></select></label>
+    <div hidden aria-hidden="true"><div id="export-size-fields"><input id="export-width" value="1600"><input id="export-height" value="900"></div><p id="export-dimensions"></p><label id="export-quality-row"><input id="export-quality" value="92"><output id="export-quality-value"></output></label><input id="export-filename" value="geovisor-juan-mina"><input id="export-title-enabled" type="checkbox"><div id="export-title-row"></div></div>
+    <p id="export-status" role="status">Se exportará la vista actual del mapa.</p>
+    <button id="export-image" class="export-submit" type="button">Exportar PDF</button>
+  </section>
+  <section id="drawing-style-panel" class="drawing-style-panel" aria-label="Estilo del dibujo" hidden>
+    <div class="style-panel-heading"><div><span class="eyebrow">Edición del dibujo</span><h2 id="style-feature-name">Selecciona un dibujo</h2></div><button id="close-style-panel" type="button" aria-label="Cerrar panel">×</button></div>
+    <label>Aplicar estilo a <select id="drawing-style-target"><option value="drawing">Dibujo seleccionado</option></select></label>
+    <p class="style-target-help">El estilo se aplica a todas las entidades de la capa elegida.</p>
+    <label>Color de línea <input id="drawing-stroke-color" type="color" value="#5f1f2d"></label>
+    <label>Grosor <input id="drawing-stroke-width" type="range" min="1" max="12" value="3"><output id="stroke-width-value">3 px</output></label>
+    <label>Estilo de línea <select id="drawing-line-pattern"><option value="solid">Continua</option><option value="dash">Discontinua</option><option value="dot">Punteada</option><option value="dashdot">Línea y punto</option></select></label>
+    <div class="style-fill-options">
+      <label class="fill-toggle"><input id="drawing-fill-enabled" type="checkbox" checked> Relleno de polígonos y puntos</label>
+      <label>Color de relleno <input id="drawing-fill-color" type="color" value="#c96e57"></label>
+      <label>Opacidad <input id="drawing-fill-opacity" type="range" min="0" max="100" value="28"><output id="fill-opacity-value">28%</output></label>
+      <label>Patrón de relleno <select id="drawing-fill-pattern"><option value="solid">Sólido</option><option value="hatch">Líneas diagonales</option><option value="cross">Trama cruzada</option><option value="dots">Puntos</option><option value="horizontal">Líneas horizontales</option><option value="vertical">Líneas verticales</option><option value="dash">Líneas discontinuas</option><option value="dotdash">Punto y raya</option><option value="none">Sin relleno</option></select></label>
+    </div>
+    <label class="point-size-row">Tamaño del punto <input id="drawing-point-size" type="range" min="3" max="24" value="8"><output id="point-size-value">8 px</output></label>
+    <p id="drawing-style-status" role="status">Dibuja o haz clic en un elemento para cambiar su estilo.</p>
+    <div class="panel-actions"><button id="delete-selected-drawing" type="button">Eliminar este dibujo</button></div>
+  </section>
+
+  <section id="labels-panel" class="labels-panel" aria-label="Configuración de etiquetas" hidden>
+    <div class="labels-panel-heading"><div><span class="eyebrow">Etiquetado cartográfico</span><h2>Etiquetas de capas</h2></div><button id="close-labels-panel" type="button" aria-label="Cerrar etiquetas">×</button></div>
+    <label>Capa shapefile <select id="label-layer"><option value="">Carga una capa vectorial</option></select></label>
+    <label class="label-enabled-row"><input id="labels-enabled" type="checkbox"> Mostrar etiquetas de esta capa</label>
+    <p class="label-help">Selecciona una capa y un campo o expresión. El estilo de relleno y contorno se actualiza al cambiar sus controles; pulsa “Aplicar etiquetas” para aplicar el resto de ajustes. Si la capa está apagada, se activará al mostrar las etiquetas.</p>
+    <label>Etiquetar con <select id="label-source"><option value="field">Un campo</option><option value="expression">Expresión</option></select></label>
+    <label id="label-field-row">Campo de etiqueta <select id="label-field"><option value="">Selecciona un campo</option></select></label>
+    <div id="label-expression-section" class="label-expression-section" hidden>
+      <label>Lenguaje <select id="label-expression-language"><option value="python">Expresión estilo Python</option><option value="vbscript">Expresión estilo VBScript</option></select></label>
+      <label>Expresión <textarea id="label-expression" rows="3" spellcheck="false" placeholder='str(properties["nombre"]) + " - " + str(properties["sector"])'></textarea></label>
+      <p class="label-help">Combina texto y campos: Python <code>str(properties["nombre"]) + " - " + str(properties["sector"])</code> · VBScript <code>CStr([nombre]) &amp; " - " &amp; CStr([sector])</code>. También se admite UCase/LCase. No se ejecuta código arbitrario.</p>
+    </div>
+    <div class="label-settings-grid">
+      <label>Fuente <select id="label-font"><option value="Segoe UI">Segoe UI</option><option value="Arial">Arial</option><option value="Tahoma">Tahoma</option><option value="Georgia">Georgia</option><option value="Verdana">Verdana</option><option value="monospace">Monoespaciada</option></select></label>
+      <label>Tamaño <span class="label-range"><input id="label-size" type="range" min="8" max="28" value="12"><output id="label-size-value">12 px</output></span></label>
+      <label>Color <input id="label-color" type="color" value="#2d0f1d"></label>
+    </div>
+    <fieldset class="label-outline-settings"><legend>Relleno de la etiqueta</legend>
+      <label class="label-enabled-row"><input id="label-fill-enabled" type="checkbox" checked> Mostrar relleno</label>
+      <div class="label-outline-grid"><label>Color <input id="label-fill-color" type="color" value="#fffaf5"></label><label>Transparencia <span class="label-range"><input id="label-fill-opacity" type="range" min="0" max="100" value="92"><output id="label-fill-opacity-value">92%</output></span></label></div>
+    </fieldset>
+    <fieldset class="label-outline-settings"><legend>Contorno de la etiqueta</legend>
+      <label class="label-enabled-row"><input id="label-outline-enabled" type="checkbox" checked> Mostrar contorno</label>
+      <div class="label-outline-grid"><label>Color <input id="label-outline-color" type="color" value="#2d0f1d"></label><label>Transparencia <span class="label-range"><input id="label-outline-opacity" type="range" min="0" max="100" value="35"><output id="label-outline-opacity-value">35%</output></span></label></div>
+    </fieldset>
+    <fieldset class="label-placements"><legend>Posición respecto a la entidad</legend>
+      <label>Puntos <select id="label-position-point"><option value="auto">Automática</option><option value="top">Arriba</option><option value="right">Derecha</option><option value="bottom">Abajo</option><option value="left">Izquierda</option><option value="center">Centro</option></select></label>
+      <label>Líneas <select id="label-position-line"><option value="center">Centro</option><option value="auto">Automática</option><option value="top">Arriba</option><option value="right">Derecha</option><option value="bottom">Abajo</option><option value="left">Izquierda</option></select></label>
+      <label>Polígonos <select id="label-position-polygon"><option value="center">Centro</option><option value="auto">Automática</option><option value="top">Arriba</option><option value="right">Derecha</option><option value="bottom">Abajo</option><option value="left">Izquierda</option></select></label>
+    </fieldset>
+    <fieldset class="label-class-settings"><legend>Clases de etiqueta y filtros</legend>
+      <div class="label-class-actions"><label>Clase <select id="label-class-select"></select></label><button id="add-label-class" type="button">+ Clase</button><button id="remove-label-class" type="button">−</button></div>
+      <label>Nombre de clase <input id="label-class-name" type="text" value="General" maxlength="40"></label>
+      <label>Filtrar por <select id="label-filter-field"><option value="">Sin filtro</option></select></label>
+      <div class="label-filter-row"><select id="label-filter-operator" aria-label="Operador del filtro"><option value="equals">Es igual a</option><option value="contains">Contiene</option><option value="starts">Empieza por</option><option value="gt">Mayor que</option><option value="lt">Menor que</option><option value="not-empty">No está vacío</option></select><input id="label-filter-value" type="text" placeholder="Valor del filtro" aria-label="Valor del filtro"></div>
+      <p class="label-help">Puedes crear varias clases; se etiquetan las entidades que cumplan al menos uno de sus filtros.</p>
+    </fieldset>
+    <fieldset class="label-scale-settings"><legend>Rango de escala visible</legend>
+      <label>Más detallada · 1:<input id="label-scale-min" type="number" min="0" step="1000" value="0"></label>
+      <label>Menos detallada · 1:<input id="label-scale-max" type="number" min="1" step="10000" value="1000000000"></label>
+      <p class="label-help">Las etiquetas aparecen entre ambos denominadores. Deja 0 y 1.000.000.000 para mostrarlas en cualquier escala.</p>
+    </fieldset>
+    <p id="labels-status" role="status">Selecciona una capa shapefile para configurar sus etiquetas.</p>
+    <button id="apply-labels" class="labels-apply" type="button">Aplicar etiquetas</button>
+  </section>
+
+  <button id="dashboard-toggle" class="dashboard-toggle" type="button" aria-label="Ocultar capas y panel del proyecto" aria-controls="project-dashboard" aria-expanded="true" title="Ocultar capas y panel del proyecto">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7"/></svg>
+  </button>
+  <aside id="project-dashboard" class="dashboard" aria-label="Resumen del geovisor">
+    <div class="dashboard-heading">
+      <div>
+        <span class="eyebrow">Panel del proyecto</span>
+        <h2>Territorio Juan Mina</h2>
+      </div>
+      <span class="status-pill"><i></i><span id="layer-status">Cargando capas…</span></span>
+    </div>
+    <p class="dashboard-intro">Corregimiento Juan Mina · Barranquilla</p>
+
+    <section class="dashboard-section dashboard-layers">
+      <h3>Capas y mapas base</h3>
+      <button id="basemap-gallery-toggle" class="basemap-gallery-toggle" type="button" aria-haspopup="dialog" aria-controls="basemap-gallery" aria-expanded="false"><span class="basemap-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 7 6-3 6 3 6-3v13l-6 3-6-3-6 3V7Zm6-3v13m6-10v13"/></svg></span><span>Mapa base</span><strong id="basemap-current-name">Imágenes</strong><span class="basemap-toggle-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg></span></button>
+      <button id="hide-all-layers" class="tool-btn secondary hide-all-layers" type="button" title="Apagar todas las capas superpuestas">Apagar todas las capas</button>
+      <div id="dashboard-layer-control"></div>
+    </section>
+
+    <div class="dashboard-stats">
+      <article class="stat-card"><span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 7 9-4 9 4-9 4-9-4Zm0 5 9 4 9-4M3 17l9 4 9-4"/></svg></span><strong id="shapefile-count">0</strong><span>Capas territoriales</span></article>
+      <article class="stat-card"><span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m14 6 4 4M4 20l4-.8L19 8a2.8 2.8 0 0 0-4-4L4 15zM4 20h16"/></svg></span><strong id="drawing-count">0</strong><span>Dibujos creados</span></article>
+    </div>
+
+    <section class="dashboard-section tools-summary">
+      <h3>Herramientas disponibles</h3>
+      <p>Dibujo de puntos, líneas y polígonos</p>
+      <p>Comparación de mapas con divisor</p>
+    </section>
+    <h3 class="advanced-tools-heading">Funciones avanzadas</h3>
+    <details id="data-import-panel" class="data-import-panel" aria-label="Importar datos locales">
+      <summary class="data-import-disclosure"><strong>Importación de capas externas</strong></summary>
+      <div class="data-import-content">
+
+      <p>Selecciona archivos o una carpeta. También puedes arrastrarlos al mapa.</p>
+      <div class="data-import-actions"><button id="data-import-files" type="button">Elegir archivos</button><button id="data-import-folder" type="button">Elegir carpeta</button></div>
+      <input id="data-import-input" type="file" multiple accept=".zip,.shp,.dbf,.shx,.prj,.cpg,.geojson,.json,.csv,.kml,.kmz,.gpx,.tif,.tiff" hidden>
+      <input id="data-import-directory" type="file" multiple webkitdirectory directory hidden>
+      <p id="data-import-status" role="status">Formatos: SHP (ZIP o archivos relacionados), GeoJSON, CSV con coordenadas, KML/KMZ, GPX y GeoTIFF.</p>
+
+      </div>
+    </details>
+    <section id="statistics-panel" class="statistics-panel dashboard-statistics" aria-label="Análisis estadístico de atributos">
+  <details id="statistics-details">
+    <summary class="statistics-disclosure"><strong id="statistics-title">Análisis estadístico</strong></summary>
+  <div class="statistics-disclosure-content">
+  <div class="statistics-controls">
+    <label>Capa <select id="statistics-layer"><option value="">Carga una capa vectorial</option></select></label>
+    <label>Agrupar por <select id="statistics-category"><option value="">Sin agrupación</option></select></label>
+    <label>Campo numérico (Y) <select id="statistics-value"><option value="">Selecciona un campo</option></select></label>
+    <label>Campo X (dispersión) <select id="statistics-x-value"><option value="__record_index">Índice del registro</option></select></label>
+    <label>Operación <select id="statistics-operation"><option value="count">Conteo</option><option value="sum">Suma</option><option value="mean">Promedio</option><option value="median">Mediana</option><option value="min">Mínimo</option><option value="max">Máximo</option><option value="area">Área geométrica (m²)</option></select></label>
+    <label>Tipo de gráfico <select id="statistics-chart-type"><option value="bar">Barras</option><option value="barHorizontal">Barras horizontales</option><option value="line">Líneas</option><option value="areaChart">Área</option><option value="pie">Circular</option><option value="doughnut">Dona</option><option value="polarArea">Área polar</option><option value="radar">Radar</option><option value="scatter">Dispersión</option><option value="bubble">Burbujas</option><option value="histogram">Histograma</option></select></label>
+    <label class="statistics-check"><input id="statistics-percent" type="checkbox"> Mostrar porcentajes</label>
+    <label>Título del gráfico <input id="statistics-chart-title" type="text" value="Resumen estadístico" maxlength="80"></label>
+    <label>Fuente del texto <select id="statistics-font-family"><option value="'Segoe UI', Tahoma, sans-serif">Segoe UI</option><option value="Arial, sans-serif">Arial</option><option value="Verdana, sans-serif">Verdana</option><option value="Georgia, serif">Georgia</option><option value="Tahoma, sans-serif">Tahoma</option></select></label>
+    <label>Tamaño del texto <span><input id="statistics-font-size" type="range" min="10" max="26" value="10"><output id="statistics-font-size-value">10 px</output></span></label>
+    <label>Inclinación etiquetas <span><input id="statistics-label-rotation" type="range" min="0" max="90" step="15" value="0"><output id="statistics-label-rotation-value">0°</output></span></label>
+    <label>Ancho PNG (px) <input id="statistics-export-width" type="number" min="800" max="5000" step="100" value="2400"></label>
+    <label>Alto PNG (px) <input id="statistics-export-height" type="number" min="600" max="4000" step="100" value="1500"></label>
+    <label>Color sin agrupación <input id="statistics-color" type="color" value="#c96e57"></label>
+    <label>Fondo del gráfico <input id="statistics-background" type="color" value="#fffaf5"></label>
+    <label>Leyenda <select id="statistics-legend-position"><option value="top">Arriba</option><option value="bottom">Abajo</option><option value="left">Izquierda</option><option value="right">Derecha</option><option value="none">Ocultar</option></select></label>
+  </div>
+  <details id="shared-color-palette" class="shared-color-palette">
+    <summary>Colores normativos sincronizados (mapa y gráficas)</summary>
+    <div class="shared-color-palette-grid">
+      <label>Residencial <input type="color" data-palette-key="residencial"></label>
+      <label>Comercial <input type="color" data-palette-key="comercial"></label>
+      <label>Dotacional <input type="color" data-palette-key="dotacional"></label>
+      <label>Servicios <input type="color" data-palette-key="servicios"></label>
+      <label>Industrial <input type="color" data-palette-key="industrial"></label>
+      <label>Espacio público proyectado <input type="color" data-palette-key="espacioPublicoProyectado"></label>
+      <label>Espacio público existente <input type="color" data-palette-key="espacioPublicoExistente"></label>
+      <button id="palette-reset" type="button">Restaurar colores normativos</button>
+    </div>
+    <p>Los cambios se aplican al mapa y a las gráficas, y se guardan en este navegador. Al agrupar la gráfica por un campo, la capa seleccionada se clasifica con ese mismo campo para mantener la correspondencia de colores.</p>
+  </details>
+  <div id="statistics-metrics" class="statistics-metrics" aria-live="polite"></div>
+  <div class="statistics-chart-toolbar"><span>Visualización del gráfico</span><button id="statistics-chart-expand" type="button" aria-controls="statistics-chart-panel" aria-expanded="false">Ampliar gráfico <span aria-hidden="true">⤢</span></button></div>
+  <div class="statistics-chart-wrap"><canvas id="statistics-chart" aria-label="Gráfico estadístico generado desde la tabla de atributos"></canvas></div>
+  <div class="statistics-footer"><p id="statistics-status" role="status">Selecciona una capa y los campos para generar el análisis.</p><button id="statistics-download" type="button" disabled>Descargar gráfico PNG</button></div>
+  </div>
+</details>
+</section>
+    <p class="dashboard-foot">Activa o desactiva las capas desde este panel.</p>
+  </aside>
+
+  <section id="basemap-gallery" class="basemap-gallery" role="dialog" aria-label="Galería de mapas base" hidden>
+    <header class="basemap-gallery-heading"><h2>Elegir mapa base</h2><button id="basemap-gallery-close" type="button" aria-label="Cerrar galería">×</button></header>
+    <div class="basemap-gallery-grid">
+      <button class="basemap-card is-active" type="button" data-basemap="imagery" aria-pressed="true"><span class="basemap-thumb"><img alt="" loading="lazy"><span class="basemap-thumb-fallback">Imágenes</span></span><span class="basemap-card-name">Imágenes</span></button>
+      <button class="basemap-card" type="button" data-basemap="streets" aria-pressed="false"><span class="basemap-thumb"><img alt="" loading="lazy"><span class="basemap-thumb-fallback">Calles</span></span><span class="basemap-card-name">Calles</span></button>
+      <button class="basemap-card" type="button" data-basemap="natgeo" aria-pressed="false"><span class="basemap-thumb"><img alt="" loading="lazy"><span class="basemap-thumb-fallback">National Geographic</span></span><span class="basemap-card-name">National Geographic</span></button>
+      <button class="basemap-card" type="button" data-basemap="topo" aria-pressed="false"><span class="basemap-thumb"><img alt="" loading="lazy"><span class="basemap-thumb-fallback">Topográfico</span></span><span class="basemap-card-name">Topográfico</span></button>
+      <button class="basemap-card" type="button" data-basemap="sunny" aria-pressed="false"><span class="basemap-thumb"><img alt="" loading="lazy"><span class="basemap-thumb-fallback">Sunny</span></span><span class="basemap-card-name">Sunny</span><span class="basemap-card-note" hidden>requiere token</span></button>
+    </div>
+  </section>
+
+  <section id="statistics-chart-panel" class="statistics-chart-panel" aria-label="Gráfico estadístico ampliado" hidden>
+    <header class="statistics-chart-panel-header"><div><span class="eyebrow">Visualización ampliada</span><h2 id="statistics-chart-panel-title">Gráfico estadístico</h2></div></header>
+    <div id="statistics-large-chart-wrap" class="statistics-large-chart-wrap"></div>
+  </section>
+
+  <section id="spatial-analysis-panel" class="spatial-analysis-panel" aria-label="Análisis espacial">
+    <header class="spatial-analysis-heading"><div class="spatial-analysis-title"><button id="spatial-analysis-collapse" class="spatial-collapse-button" type="button" aria-controls="spatial-analysis-content" aria-expanded="false" aria-label="Maximizar análisis espacial" title="Maximizar panel"><span aria-hidden="true"></span></button><div><h2>Análisis espacial</h2></div></div><button id="spatial-info-expand" class="spatial-expand-button" type="button" aria-controls="spatial-analysis-panel" aria-expanded="false" title="Maximizar análisis en el panel inferior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v4m0-4 6 6M16 20h4v-4m0 4-6-6"/></svg><span>Maximizar análisis</span></button></header>
+    <div id="spatial-analysis-content" class="spatial-analysis-content" hidden>
+      <section class="spatial-analysis-section"><h3>1. Zona de influencia de vías</h3>
+        <div class="spatial-buffer-controls"><label for="spatial-buffer-distance">Distancia: <output id="spatial-buffer-value">250 m</output></label><input id="spatial-buffer-distance" type="range" min="50" max="1000" step="50" value="250"><div class="panel-actions"><button type="button" data-buffer-shortcut="100">100 m</button><button type="button" data-buffer-shortcut="250">250 m</button><button type="button" data-buffer-shortcut="500">500 m</button></div></div>
+        <div id="spatial-buffer-results" class="spatial-analysis-results"></div><div class="spatial-analysis-table-wrap"><table id="spatial-blocks-table"><thead><tr><th>Manzana</th><th>Dentro (ha)</th><th>Manzana (%)</th><th>Zona (%)</th></tr></thead><tbody></tbody></table></div>
+      </section>
+      <section class="spatial-analysis-section"><h3>2. Cruce de usos y tratamientos</h3><div id="spatial-compatibility"></div><div id="spatial-intersection-results" class="spatial-analysis-results"></div><div class="spatial-analysis-table-wrap"><table id="spatial-intersection-table"><thead><tr><th>Uso</th><th>Tratamiento</th><th>Área (ha)</th><th>Total (%)</th><th>Compatibilidad</th></tr></thead><tbody></tbody></table></div>
+      </section>
+      <details class="spatial-analysis-section spatial-indicator-section" open>
+        <summary class="spatial-indicator-disclosure"><h3>3. Indicadores</h3></summary>
+        <div class="spatial-dynamic-controls">
+          <label>Capa<select id="spatial-layer-select"><option value="__base__">Indicadores base · Juan Mina</option></select></label>
+          <label>Analizar por<select id="spatial-field-select"><option value="">Sin agrupar</option></select></label>
+          <label>Zona de análisis<select id="spatial-zone-select"><option value="limit">Todo el límite</option><option value="influence">Dentro de influencia</option></select></label>
+          <button id="spatial-remove-layer" type="button" disabled>Quitar capa importada</button>
+        </div>
+        <p id="spatial-dynamic-status" class="spatial-dynamic-status" role="status">Indicadores base de Juan Mina.</p>
+        <div id="spatial-indicators" class="spatial-indicator-grid"></div><div id="spatial-uses-chart" class="spatial-uses-chart"></div>
+        <p id="spatial-quality" class="spatial-analysis-note" role="status"></p>
+      </details>
+      <div class="panel-actions spatial-analysis-actions"><button id="spatial-export-csv" type="button">Exportar tabla (CSV)</button><button id="spatial-clear-analysis" type="button">Limpiar análisis</button></div>
+      <p id="spatial-analysis-status" role="status">Cargando capas de Juan Mina…</p>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/shpjs@6.2.0/dist/shp.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="https://unpkg.com/georaster@1.6.0/dist/georaster.browser.bundle.min.js"></script>
+  <script src="https://unpkg.com/georaster-layer-for-leaflet@3.10.0/dist/georaster-layer-for-leaflet.min.js"></script>
+  <script src="https://unpkg.com/leaflet-image@0.4.0/leaflet-image.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="scripts.js?v=remove-measure-hide-layers-1"></script>
+  <script src="layout-export.js?v=1"></script>
+</body>
+</html>
